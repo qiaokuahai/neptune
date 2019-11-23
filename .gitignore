@@ -1,0 +1,16 @@
+*.pyc
+*.pyd
+*.so
+.coverage
+.eggs
+.project
+.pydevproject
+.settings/
+.tox/
+.cache/
+.idea
+.output
+*.log
+build/*
+dist/*
+venv/
