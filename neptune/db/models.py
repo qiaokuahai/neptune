@@ -1,38 +1,66 @@
-from sqlalchemy import Column, ForeignKey, String, INTEGER
-from sqlalchemy.orm import relationship
+from __future__ import absolute_import
+
 from sqlalchemy.ext.declarative import declarative_base
 
-from neptune.db import dictbase
 
 Base = declarative_base()
 metadata = Base.metadata
 
 
-class Address(Base, dictbase.DictBase):
-    __tablename__ = 'address'
-
-    id = Column(String(36), primary_key=True)
-    location = Column(String(63), nullable=False)
-    user_id = Column(ForeignKey(u'user.id', ondelete=u'CASCADE', onupdate=u'CASCADE'), nullable=False)
-
-    user = relationship(u'User')
+def get_names():
+    """
+    获取所有Model类名
+    """
+    return Base._decl_class_registry.keys()
 
 
-class Department(Base, dictbase.DictBase):
-    __tablename__ = 'department'
+def get_class_by_name(name):
+    """
+    根据Model类名获取类
 
-    id = Column(String(36), primary_key=True)
-    name = Column(String(63), nullable=False)
+    :param name: Model类名
+    :type name: str
+    :returns: Model类
+    :rtype: class
+    """
+    return Base._decl_class_registry.get(name, None)
 
 
-class User(Base, dictbase.DictBase):
-    __tablename__ = 'user'
-    attributes = ['id', 'name', 'department_id', 'age', 'department', 'addresses']
+def get_class_by_tablename(tablename):
+    """
+    根据表名获取类
 
-    id = Column(String(36), primary_key=True)
-    name = Column(String(63), nullable=False)
-    department_id = Column(ForeignKey(u'department.id', ondelete=u'RESTRICT', onupdate=u'RESTRICT'), nullable=False)
-    age = Column(INTEGER, nullable=True)
+    :param tablename: 表名
+    :type tablename: str
+    :returns: Model类
+    :rtype: class
+    """
+    for c in Base._decl_class_registry.values():
+        if hasattr(c, '__tablename__') and c.__tablename__ == tablename:
+            return c
 
-    department = relationship(u'Department', lazy=False)
-    addresses = relationship(u'Address', lazy=False, back_populates=u'user', uselist=True, viewonly=True)
+
+def get_tablename_by_name(name):
+    """
+    根据Model类名获取表名
+
+    :param name: Model类名
+    :type name: str
+    :returns: 表名
+    :rtype: str
+    """
+    return Base._decl_class_registry.get(name, None).__tablename__
+
+
+def get_name_by_class(modelclass):
+    """
+    根据Model类获取类名
+
+    :param modelclass: Model类
+    :type modelclass: class
+    :returns: 类名
+    :rtype: str
+    """
+    for n, c in Base._decl_class_registry.items():
+        if c == modelclass:
+            return n
