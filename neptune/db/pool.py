@@ -65,7 +65,9 @@ class DBPool(object):
         :returns: 是否重建成功
         :rtype: bool
         """
-        param.setdefault('echo', CONF.log.level.upper() == 'DEBUG')
+        log_type = param.get("echo", "DEBUG").upper()
+        is_echo = True if log_type == "DEBUG" else False
+        param.setdefault('echo', is_echo)
         connection = param.pop('connection')
         self._pool = sessionmaker(bind=sqlalchemy.create_engine(connection, **param), autocommit=True)
         return True
